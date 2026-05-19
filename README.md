@@ -1,3 +1,3 @@
 KATANAVERSE:
-go to github.io/xerniu3000
+go to github.com/xerniu3000
 
