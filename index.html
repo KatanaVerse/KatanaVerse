@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#050507">
+<meta name="description" content="KatanaVerse — sharpened tools for thinking and faith. Home of KatanaOS, OKATAN AI, and Selah.">
+<title>KatanaVerse</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KatanaVerse">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   KATANAVERSE
+   Sharpened Steel aesthetic — obsidian + blade-cyan + rose + crimson
+   ============================================================ */
+:root{
+  --bg:#050507;
+  --bg-deep:#0a0a0d;
+  --steel:#e8e6e0;
+  --steel-dim:rgba(232,230,224,0.55);
+  --steel-faint:rgba(232,230,224,0.2);
+  --steel-ghost:rgba(232,230,224,0.06);
+  --cyan:#7dd3fc;
+  --cyan-glow:rgba(125,211,252,0.4);
+  --rose:#f472b6;
+  --rose-glow:rgba(244,114,182,0.4);
+  --crimson:#dc2626;
+  --crimson-glow:rgba(220,38,38,0.5);
+  --gold:#fbbf24;
+  --gold-glow:rgba(251,191,36,0.4);
+  --emerald:#34d399;
+  --emerald-glow:rgba(52,211,153,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--steel);
+  font-family:'Cormorant Garamond',Georgia,serif;
+  overflow-x:hidden;
+  min-height:100vh;
+  cursor:none;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* ===== Custom cursor ===== */
+.kv-cursor{
+  position:fixed;
+  width:32px;height:32px;
+  border:1px solid var(--steel);
+  border-radius:50%;
+  top:0;left:0;
+  pointer-events:none;
+  z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:width 0.2s,height 0.2s,background 0.2s,border-color 0.2s,opacity 0.2s;
+  mix-blend-mode:difference;
+}
+.kv-cursor::before{
+  content:'';
+  position:absolute;
+  inset:50% 0 0 50%;
+  width:1px;height:8px;
+  background:var(--steel);
+  transform:translate(-50%,-100%);
+}
+.kv-cursor::after{
+  content:'';
+  position:absolute;
+  inset:50% 0 0 0;
+  width:8px;height:1px;
+  background:var(--steel);
+  transform:translate(0,-50%);
+}
+.kv-cursor.hover{
+  width:60px;height:60px;
+  background:rgba(125,211,252,0.08);
+  border-color:var(--cyan);
+}
+.kv-cursor.hover-rose{
+  width:60px;height:60px;
+  background:rgba(244,114,182,0.08);
+  border-color:var(--rose);
+}
+.kv-cursor.hover-gold{
+  width:60px;height:60px;
+  background:rgba(251,191,36,0.1);
+  border-color:var(--gold);
+}
+@media (hover:none){
+  body{cursor:auto}
+  .kv-cursor{display:none}
+}
+
+/* ===== Atmospheric background ===== */
+.kv-bg{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(125,211,252,0.05), transparent 60%),
+    radial-gradient(ellipse 60% 80% at 100% 100%, rgba(244,114,182,0.04), transparent 60%),
+    radial-gradient(circle at 50% 50%, var(--bg-deep), var(--bg));
+}
+.kv-grain{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  opacity:0.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+.kv-scanlines{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:repeating-linear-gradient(
+    180deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(255,255,255,0.012) 2px,
+    rgba(255,255,255,0.012) 3px
+  );
+  mix-blend-mode:overlay;
+}
+
+/* ===== Loading overlay ===== */
+.kv-loader{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  background:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:opacity 0.8s 0.4s ease,visibility 0s 1.2s;
+}
+.kv-loader.hide{opacity:0;visibility:hidden}
+.kv-loader-text{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:6px;
+  color:var(--cyan);
+  text-transform:uppercase;
+  animation:loaderPulse 1.4s infinite;
+}
+@keyframes loaderPulse{
+  0%,100%{opacity:0.3}
+  50%{opacity:1}
+}
+
+/* ===== Top bar ===== */
+.kv-topbar{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:100;
+  padding:24px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--steel-dim);
+  pointer-events:none;
+}
+.kv-topbar > *{pointer-events:auto}
+.kv-topbar-left{display:flex;gap:24px;align-items:center}
+.kv-topbar-right{display:flex;gap:24px;align-items:center}
+.kv-status-dot{
+  display:inline-block;
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--cyan);
+  margin-right:8px;
+  animation:dotPulse 2s infinite;
+  box-shadow:0 0 8px var(--cyan-glow);
+}
+@keyframes dotPulse{
+  0%,100%{opacity:0.4}
+  50%{opacity:1}
+}
+@media (max-width:768px){
+  .kv-topbar{padding:16px 20px;font-size:9px;letter-spacing:2px}
+  .kv-topbar-left > *:not(:first-child),
+  .kv-topbar-right > *:not(:last-child){display:none}
+}
+
+/* ===== Hero ===== */
+.kv-hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  padding:120px 20px 60px;
+  overflow:hidden;
+}
+
+/* Blade SVG */
+.kv-blade-wrap{
+  width:min(900px,90vw);
+  margin-bottom:40px;
+  opacity:0;
+  animation:bladeFade 1s 1.2s forwards;
+}
+@keyframes bladeFade{to{opacity:1}}
+.kv-blade{
+  width:100%;
+  height:auto;
+  display:block;
+  filter:drop-shadow(0 0 20px rgba(125,211,252,0.15));
+}
+.kv-blade path,.kv-blade line{
+  fill:none;
+  stroke:var(--steel);
+  stroke-width:1.5;
+}
+.kv-blade .blade-body{
+  stroke-dasharray:1200;
+  stroke-dashoffset:1200;
+  animation:bladeDraw 2s 1.4s cubic-bezier(0.65,0,0.35,1) forwards;
+}
+.kv-blade .blade-edge{
+  stroke-dasharray:1200;
+  stroke-dashoffset:1200;
+  animation:bladeDraw 2s 1.6s cubic-bezier(0.65,0,0.35,1) forwards;
+  stroke:var(--cyan);
+  stroke-width:1;
+  opacity:0.6;
+}
+.kv-blade .blade-tsuba{
+  stroke-dasharray:200;
+  stroke-dashoffset:200;
+  animation:bladeDraw 0.6s 2.8s ease-out forwards;
+  stroke:var(--crimson);
+}
+.kv-blade .blade-handle{
+  stroke-dasharray:200;
+  stroke-dashoffset:200;
+  animation:bladeDraw 0.5s 3.0s ease-out forwards;
+}
+@keyframes bladeDraw{to{stroke-dashoffset:0}}
+
+/* Wordmark */
+.kv-wordmark{
+  font-family:'Cinzel',serif;
+  font-size:clamp(48px,11vw,140px);
+  font-weight:600;
+  letter-spacing:0.08em;
+  line-height:0.95;
+  text-align:center;
+  color:var(--steel);
+  margin-bottom:8px;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.kv-wordmark span{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(40px);
+  animation:letterRise 0.6s forwards cubic-bezier(0.34,1.56,0.64,1);
+}
+.kv-wordmark .kv-mark-sep{
+  margin:0 0.02em;
+  color:var(--crimson);
+}
+@keyframes letterRise{
+  to{opacity:1;transform:translateY(0)}
+}
+
+.kv-tagline{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:6px;
+  text-transform:uppercase;
+  color:var(--steel-dim);
+  margin-top:24px;
+  text-align:center;
+  opacity:0;
+  animation:taglineFade 1s 3.8s forwards;
+}
+@keyframes taglineFade{to{opacity:1}}
+.kv-tagline-bracket{color:var(--cyan);margin:0 12px}
+
+.kv-hero-meta{
+  position:absolute;
+  bottom:40px;
+  left:50%;
+  transform:translateX(-50%);
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--steel-faint);
+  opacity:0;
+  animation:taglineFade 1s 4.4s forwards;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+}
+.kv-scroll-arrow{
+  width:1px;
+  height:40px;
+  background:linear-gradient(180deg,var(--steel-dim),transparent);
+  position:relative;
+  animation:scrollPulse 2s infinite;
+}
+@keyframes scrollPulse{
+  0%,100%{transform:scaleY(1);opacity:0.4}
+  50%{transform:scaleY(1.3);opacity:1}
+}
+
+/* ===== Section ===== */
+.kv-section{
+  padding:140px 40px 100px;
+  position:relative;
+  max-width:1400px;
+  margin:0 auto;
+}
+.kv-section-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-bottom:80px;
+  flex-wrap:wrap;
+  gap:20px;
+  border-bottom:1px solid var(--steel-faint);
+  padding-bottom:24px;
+}
+.kv-section-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(32px,5vw,56px);
+  font-weight:500;
+  letter-spacing:0.04em;
+  line-height:1;
+}
+.kv-section-meta{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--steel-dim);
+}
+.kv-section-number{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--crimson);
+  margin-bottom:8px;
+  display:block;
+  letter-spacing:3px;
+}
+
+/* ===== Product cards ===== */
+.kv-products{
+  display:grid;
+  gap:120px;
+}
+
+.kv-product{
+  position:relative;
+  display:grid;
+  grid-template-columns:1.1fr 1fr;
+  gap:60px;
+  align-items:center;
+  padding:60px 50px;
+  border:1px solid var(--steel-faint);
+  background:linear-gradient(135deg, rgba(255,255,255,0.015), rgba(255,255,255,0.005));
+  overflow:visible;
+  opacity:0;
+  transform:translateY(60px);
+  transition:opacity 1s,transform 1s;
+}
+/* Inner clipping wrapper - so the scan-line stays inside but the flagship badge can hang outside */
+.kv-product .kv-scan{
+  clip-path:inset(0);
+}
+.kv-product.in-view{
+  opacity:1;
+  transform:translateY(0);
+}
+.kv-product::before{
+  content:'';
+  position:absolute;
+  top:-2px;left:-2px;
+  width:30px;height:30px;
+  border-top:1px solid var(--cyan);
+  border-left:1px solid var(--cyan);
+  transition:width 0.5s,height 0.5s;
+}
+.kv-product::after{
+  content:'';
+  position:absolute;
+  bottom:-2px;right:-2px;
+  width:30px;height:30px;
+  border-bottom:1px solid var(--cyan);
+  border-right:1px solid var(--cyan);
+  transition:width 0.5s,height 0.5s;
+}
+.kv-product:hover::before,.kv-product:hover::after{
+  width:60px;height:60px;
+}
+
+/* Scan-line sweep on hover */
+.kv-product .kv-scan{
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:50%;
+  height:100%;
+  background:linear-gradient(90deg, transparent, rgba(125,211,252,0.06), transparent);
+  pointer-events:none;
+  transition:left 1s cubic-bezier(0.65,0,0.35,1);
+}
+.kv-product:hover .kv-scan{left:150%}
+
+.kv-product.product-selah .kv-scan{
+  background:linear-gradient(90deg, transparent, rgba(244,114,182,0.06), transparent);
+}
+.kv-product.product-selah::before,
+.kv-product.product-selah::after{
+  border-color:var(--rose);
+}
+
+/* KatanaOS — gold accent (the flagship system) */
+.kv-product.product-katanaos .kv-scan{
+  background:linear-gradient(90deg, transparent, rgba(251,191,36,0.08), transparent);
+}
+.kv-product.product-katanaos::before,
+.kv-product.product-katanaos::after{
+  border-color:var(--gold);
+}
+.kv-product.product-katanaos .kv-product-tag{color:var(--gold)}
+.kv-product.product-katanaos .kv-product-tag::before{background:var(--gold)}
+.kv-product.product-katanaos:hover .kv-product-name .kv-letter{
+  color:var(--gold);
+}
+.kv-product.product-katanaos .kv-product-desc em{color:var(--gold)}
+.kv-product.product-katanaos .kv-product-features li::before{color:var(--gold)}
+.kv-product.product-katanaos .kv-launch::before{background:var(--gold)}
+.kv-product.product-katanaos .kv-launch:hover{border-color:var(--gold)}
+.kv-product.product-katanaos .kv-visual-frame::before,
+.kv-product.product-katanaos .kv-visual-frame::after{border-color:var(--gold)}
+.kv-product.product-katanaos .kv-visual-rings::before,
+.kv-product.product-katanaos .kv-visual-rings::after{border-color:var(--gold)}
+.kv-product.product-katanaos .kv-visual-status .kv-status-dot{
+  background:var(--gold);
+  box-shadow:0 0 8px var(--gold-glow);
+}
+
+/* KatanaOS flagship badge */
+.kv-flagship-badge{
+  position:absolute;
+  top:-13px;
+  left:40px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--bg);
+  background:var(--gold);
+  padding:7px 14px;
+  z-index:3;
+  font-weight:700;
+  box-shadow:0 2px 12px rgba(251,191,36,0.3);
+}
+
+/* Give the flagship product extra top margin so badge doesn't hit section title */
+.kv-product.product-katanaos{margin-top:40px}
+
+@media (max-width:900px){
+  .kv-product{
+    grid-template-columns:1fr;
+    gap:40px;
+    padding:40px 30px;
+  }
+}
+
+.kv-product-content{position:relative;z-index:2}
+.kv-product-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--cyan);
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.kv-product-tag::before{
+  content:'';
+  display:inline-block;
+  width:24px;
+  height:1px;
+  background:var(--cyan);
+}
+.kv-product.product-selah .kv-product-tag{color:var(--rose)}
+.kv-product.product-selah .kv-product-tag::before{background:var(--rose)}
+
+.kv-product-name{
+  font-family:'Cinzel',serif;
+  font-size:clamp(48px,7vw,84px);
+  font-weight:600;
+  letter-spacing:0.04em;
+  line-height:1;
+  margin-bottom:16px;
+}
+.kv-product-name .kv-letter{
+  display:inline-block;
+  transition:color 0.3s, transform 0.3s;
+}
+.kv-product:hover .kv-product-name .kv-letter{
+  animation:letterFlicker 1.5s ease-in-out;
+}
+.kv-product.product-okatan:hover .kv-product-name .kv-letter{
+  color:var(--cyan);
+}
+.kv-product.product-selah:hover .kv-product-name .kv-letter{
+  color:var(--rose);
+}
+@keyframes letterFlicker{
+  0%,100%{filter:brightness(1)}
+  50%{filter:brightness(1.5)}
+}
+
+.kv-product-subtitle{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:var(--steel-dim);
+  margin-bottom:32px;
+}
+
+.kv-product-desc{
+  font-size:18px;
+  line-height:1.7;
+  color:var(--steel);
+  margin-bottom:32px;
+  max-width:520px;
+  font-weight:300;
+}
+.kv-product-desc em{
+  color:var(--cyan);
+  font-style:italic;
+}
+.kv-product.product-selah .kv-product-desc em{color:var(--rose)}
+
+.kv-product-features{
+  list-style:none;
+  margin-bottom:40px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px 24px;
+}
+@media (max-width:600px){.kv-product-features{grid-template-columns:1fr}}
+.kv-product-features li{
+  font-size:14px;
+  color:var(--steel);
+  padding-left:20px;
+  position:relative;
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:1px;
+  line-height:1.5;
+}
+.kv-product-features li::before{
+  content:'▸';
+  position:absolute;
+  left:0;
+  color:var(--cyan);
+}
+.kv-product.product-selah .kv-product-features li::before{color:var(--rose)}
+
+.kv-launch{
+  display:inline-flex;
+  align-items:center;
+  gap:14px;
+  padding:18px 32px;
+  background:transparent;
+  border:1px solid var(--steel);
+  color:var(--steel);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  text-decoration:none;
+  position:relative;
+  overflow:hidden;
+  transition:color 0.4s,border-color 0.4s;
+  font-weight:500;
+}
+.kv-launch::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:var(--cyan);
+  transform:translateX(-101%);
+  transition:transform 0.5s cubic-bezier(0.65,0,0.35,1);
+  z-index:-1;
+}
+.kv-launch:hover{color:var(--bg);border-color:var(--cyan)}
+.kv-launch:hover::before{transform:translateX(0)}
+.kv-launch .kv-arrow{
+  display:inline-block;
+  transition:transform 0.3s;
+}
+.kv-launch:hover .kv-arrow{transform:translateX(6px)}
+.kv-product.product-selah .kv-launch::before{background:var(--rose)}
+.kv-product.product-selah .kv-launch:hover{border-color:var(--rose)}
+
+.kv-mirror-links{
+  margin-top:18px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--steel-faint);
+}
+.kv-mirror-links a{
+  color:var(--steel-dim);
+  text-decoration:none;
+  border-bottom:1px dotted var(--steel-faint);
+  margin-left:8px;
+  transition:color 0.2s,border-color 0.2s;
+}
+.kv-mirror-links a:hover{color:var(--cyan);border-color:var(--cyan)}
+
+/* ===== Product visual (right side) ===== */
+.kv-product-visual{
+  position:relative;
+  aspect-ratio:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.kv-visual-frame{
+  position:absolute;
+  inset:0;
+  border:1px solid var(--steel-faint);
+}
+.kv-visual-frame::before,
+.kv-visual-frame::after{
+  content:'';
+  position:absolute;
+  width:12px;
+  height:12px;
+}
+.kv-visual-frame::before{top:-1px;left:-1px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan)}
+.kv-visual-frame::after{bottom:-1px;right:-1px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan)}
+.kv-product.product-selah .kv-visual-frame::before,
+.kv-product.product-selah .kv-visual-frame::after{border-color:var(--rose)}
+
+.kv-visual-icon{
+  width:60%;
+  height:60%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation:floatY 6s ease-in-out infinite;
+}
+@keyframes floatY{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-12px)}
+}
+
+/* OKATAN crest */
+.kv-okatan-svg{width:100%;height:100%;filter:drop-shadow(0 0 30px rgba(125,211,252,0.4))}
+.kv-okatan-svg path,.kv-okatan-svg circle,.kv-okatan-svg line,.kv-okatan-svg polygon{
+  stroke:var(--cyan);
+  fill:none;
+  stroke-width:1.5;
+}
+.kv-okatan-svg .kv-ok-fill{fill:var(--cyan);fill-opacity:0.1}
+.kv-okatan-svg .kv-ok-red{stroke:var(--crimson)}
+
+/* Selah icon */
+.kv-selah-svg{width:100%;height:100%;filter:drop-shadow(0 0 30px rgba(244,114,182,0.4))}
+.kv-selah-svg path,.kv-selah-svg line{stroke:var(--rose);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kv-selah-svg .kv-selah-fill{fill:var(--rose);fill-opacity:0.08}
+
+/* KatanaOS icon - phone with grid + crossed katanas */
+.kv-katanaos-svg{width:100%;height:100%;filter:drop-shadow(0 0 30px rgba(251,191,36,0.5))}
+.kv-katanaos-svg path,.kv-katanaos-svg rect,.kv-katanaos-svg line,.kv-katanaos-svg circle{
+  stroke:var(--gold);
+  fill:none;
+  stroke-width:1.5;
+}
+.kv-katanaos-svg .kv-os-fill{fill:var(--gold);fill-opacity:0.1}
+.kv-katanaos-svg .kv-os-dot{fill:var(--gold);fill-opacity:0.7;stroke:none}
+
+.kv-visual-rings{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+.kv-visual-rings::before,.kv-visual-rings::after{
+  content:'';
+  position:absolute;
+  border-radius:50%;
+  border:1px solid var(--cyan);
+  opacity:0.15;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+.kv-visual-rings::before{
+  width:85%;
+  height:85%;
+  animation:ringRotate 30s linear infinite;
+  border-style:dashed;
+}
+.kv-visual-rings::after{
+  width:70%;
+  height:70%;
+  animation:ringRotate 20s linear infinite reverse;
+}
+.kv-product.product-selah .kv-visual-rings::before,
+.kv-product.product-selah .kv-visual-rings::after{border-color:var(--rose)}
+@keyframes ringRotate{
+  to{transform:translate(-50%,-50%) rotate(360deg)}
+}
+
+/* Status indicator on visual */
+.kv-visual-status{
+  position:absolute;
+  bottom:16px;left:16px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  color:var(--steel-dim);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  text-transform:uppercase;
+}
+.kv-visual-status .kv-status-dot{
+  margin-right:0;
+}
+.kv-product.product-selah .kv-visual-status .kv-status-dot{
+  background:var(--rose);
+  box-shadow:0 0 8px var(--rose-glow);
+}
+.kv-visual-tag{
+  position:absolute;
+  top:16px;right:16px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  color:var(--steel-dim);
+  text-transform:uppercase;
+}
+
+/* ===== About / Philosophy section ===== */
+.kv-about{
+  padding:120px 40px;
+  position:relative;
+  background:linear-gradient(180deg, transparent, rgba(125,211,252,0.02), transparent);
+}
+.kv-about-wrap{
+  max-width:900px;
+  margin:0 auto;
+  text-align:center;
+}
+.kv-about-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:6px;
+  text-transform:uppercase;
+  color:var(--crimson);
+  margin-bottom:24px;
+}
+.kv-about-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(22px,3vw,32px);
+  line-height:1.5;
+  font-weight:300;
+  font-style:italic;
+  color:var(--steel);
+}
+.kv-about-text .kv-w-cyan{color:var(--cyan);font-style:normal;font-weight:500}
+.kv-about-text .kv-w-gold{color:var(--gold);font-style:normal;font-weight:500}
+.kv-about-text .kv-w-rose{color:var(--rose);font-style:normal;font-weight:500}
+.kv-about-attribution{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:var(--steel-dim);
+  margin-top:40px;
+}
+
+/* ===== Open Source section ===== */
+.kv-source{
+  padding:100px 40px 60px;
+  max-width:1000px;
+  margin:0 auto;
+  text-align:center;
+  position:relative;
+}
+.kv-source-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:6px;
+  text-transform:uppercase;
+  color:var(--crimson);
+  margin-bottom:20px;
+}
+.kv-source-title{
+  font-family:'Cinzel',serif;
+  font-size:clamp(28px,4vw,42px);
+  font-weight:500;
+  letter-spacing:0.04em;
+  line-height:1.1;
+  margin-bottom:20px;
+}
+.kv-source-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;
+  line-height:1.6;
+  font-weight:300;
+  color:var(--steel-dim);
+  max-width:640px;
+  margin:0 auto 36px;
+}
+.kv-source-link{
+  display:inline-flex;
+  align-items:center;
+  gap:14px;
+  padding:16px 30px;
+  background:transparent;
+  border:1px solid var(--steel);
+  color:var(--steel);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  text-decoration:none;
+  position:relative;
+  overflow:hidden;
+  transition:color 0.4s,border-color 0.4s;
+  font-weight:500;
+}
+.kv-source-link::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:var(--steel);
+  transform:translateX(-101%);
+  transition:transform 0.5s cubic-bezier(0.65,0,0.35,1);
+  z-index:-1;
+}
+.kv-source-link:hover{color:var(--bg);border-color:var(--steel)}
+.kv-source-link:hover::before{transform:translateX(0)}
+.kv-source-icon{
+  display:inline-block;
+  width:18px;height:18px;
+  vertical-align:middle;
+}
+.kv-source-icon svg{display:block;width:100%;height:100%;fill:currentColor}
+
+/* ===== Footer ===== */
+.kv-footer{
+  padding:60px 40px 40px;
+  border-top:1px solid var(--steel-faint);
+  margin-top:80px;
+}
+.kv-footer-wrap{
+  max-width:1400px;
+  margin:0 auto;
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:30px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--steel-dim);
+}
+.kv-footer-wordmark{
+  font-family:'Cinzel',serif;
+  font-size:14px;
+  letter-spacing:6px;
+  color:var(--steel);
+  font-weight:500;
+}
+
+/* ===== Animations & utility ===== */
+.kv-fade-in{
+  opacity:0;
+  transform:translateY(30px);
+  transition:opacity 0.8s,transform 0.8s;
+}
+.kv-fade-in.in-view{opacity:1;transform:translateY(0)}
+
+/* Stagger children when parent gains .in-view */
+.kv-stagger > *{opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
+.kv-stagger.in-view > *{opacity:1;transform:translateY(0)}
+.kv-stagger.in-view > *:nth-child(1){transition-delay:0.05s}
+.kv-stagger.in-view > *:nth-child(2){transition-delay:0.15s}
+.kv-stagger.in-view > *:nth-child(3){transition-delay:0.25s}
+.kv-stagger.in-view > *:nth-child(4){transition-delay:0.35s}
+.kv-stagger.in-view > *:nth-child(5){transition-delay:0.45s}
+.kv-stagger.in-view > *:nth-child(6){transition-delay:0.55s}
+.kv-stagger.in-view > *:nth-child(7){transition-delay:0.65s}
+.kv-stagger.in-view > *:nth-child(8){transition-delay:0.75s}
+
+::selection{background:var(--cyan);color:var(--bg)}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="kv-cursor" id="kv-cursor"></div>
+
+<!-- Atmospheric layers -->
+<div class="kv-bg"></div>
+<div class="kv-grain"></div>
+<div class="kv-scanlines"></div>
+
+<!-- Loading splash -->
+<div class="kv-loader" id="kv-loader">
+  <div class="kv-loader-text">UNSHEATHING</div>
+</div>
+
+<!-- Top bar -->
+<header class="kv-topbar">
+  <div class="kv-topbar-left">
+    <span><span class="kv-status-dot"></span>SYSTEMS ONLINE</span>
+    <span id="kv-time">--:--:-- UTC</span>
+    <span>LAT 49.2°N</span>
+  </div>
+  <div class="kv-topbar-right">
+    <span>EST. 2025</span>
+    <span>v01</span>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="kv-hero">
+  <div class="kv-blade-wrap">
+    <svg class="kv-blade" viewBox="0 0 1200 80" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <!-- Handle (tsuka) -->
+      <line class="blade-handle" x1="20" y1="40" x2="160" y2="40" stroke-width="6"/>
+      <line class="blade-handle" x1="40" y1="34" x2="140" y2="34"/>
+      <line class="blade-handle" x1="40" y1="46" x2="140" y2="46"/>
+      <!-- Guard (tsuba) -->
+      <path class="blade-tsuba" d="M160 24 L180 24 L180 56 L160 56 Z" stroke-width="2"/>
+      <!-- Blade body -->
+      <path class="blade-body" d="M180 36 L1170 38 L1185 40 L1170 42 L180 44 Z"/>
+      <!-- Blade edge (highlight) -->
+      <path class="blade-edge" d="M185 38 L1170 39"/>
+    </svg>
+  </div>
+
+  <h1 class="kv-wordmark" aria-label="KatanaVerse">
+    <span style="animation-delay:2.0s">K</span>
+    <span style="animation-delay:2.06s">A</span>
+    <span style="animation-delay:2.12s">T</span>
+    <span style="animation-delay:2.18s">A</span>
+    <span style="animation-delay:2.24s">N</span>
+    <span style="animation-delay:2.30s">A</span>
+    <span class="kv-mark-sep" style="animation-delay:2.40s">·</span>
+    <span style="animation-delay:2.50s">V</span>
+    <span style="animation-delay:2.56s">E</span>
+    <span style="animation-delay:2.62s">R</span>
+    <span style="animation-delay:2.68s">S</span>
+    <span style="animation-delay:2.74s">E</span>
+  </h1>
+
+  <div class="kv-tagline">
+    <span class="kv-tagline-bracket">[</span>
+    Sharpened tools for thinking &amp; faith
+    <span class="kv-tagline-bracket">]</span>
+  </div>
+
+  <div class="kv-hero-meta">
+    <div>scroll</div>
+    <div class="kv-scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="kv-section" id="products">
+  <div class="kv-section-header kv-fade-in">
+    <div>
+      <span class="kv-section-number">/01 — CATALOG</span>
+      <h2 class="kv-section-title">The Forge</h2>
+    </div>
+    <div class="kv-section-meta">03 SYSTEMS · ALL ACTIVE</div>
+  </div>
+
+  <div class="kv-products">
+
+    <!-- KATANAOS — Flagship -->
+    <article class="kv-product product-katanaos">
+      <span class="kv-flagship-badge">★ FLAGSHIP</span>
+      <span class="kv-scan"></span>
+      <div class="kv-product-content kv-stagger">
+        <div class="kv-product-tag">SYSTEM /01 · PERSONAL PHONE OS</div>
+        <h3 class="kv-product-name" data-text="KATANAOS">
+          <span class="kv-letter">K</span><span class="kv-letter">A</span><span class="kv-letter">T</span><span class="kv-letter">A</span><span class="kv-letter">N</span><span class="kv-letter">A</span><span class="kv-letter">O</span><span class="kv-letter">S</span>
+        </h3>
+        <div class="kv-product-subtitle">The Whole System · Single-File PWA</div>
+        <p class="kv-product-desc">
+          A complete <em>phone operating layer</em> in one installable web app. OKATAN lives inside it. Selah lives inside it. Smart home, calendar, financial audit, weather, shopping, habits, voice control, wake-word, offline AI — all the apps you actually use, on one screen, on your terms. <em>Your phone, your way</em>, replacing whatever the manufacturer thinks you need.
+        </p>
+        <ul class="kv-product-features">
+          <li>OKATAN AI built in</li>
+          <li>Selah built in</li>
+          <li>Voice &amp; wake-word</li>
+          <li>Smart home control</li>
+          <li>Calendar &amp; reminders</li>
+          <li>Financial audit suite</li>
+          <li>140+ apps in 18 folders</li>
+          <li>Offline AI (WebLLM)</li>
+        </ul>
+        <a class="kv-launch" href="https://katanaverse.net" target="_blank" rel="noopener" data-cursor="gold">
+          <span>Launch KatanaOS</span>
+          <span class="kv-arrow">→</span>
+        </a>
+        <div class="kv-mirror-links">
+          PRIMARY <a href="https://katanaverse.net" target="_blank" rel="noopener" data-cursor="gold">katanaverse.net</a>
+        </div>
+      </div>
+      <div class="kv-product-visual">
+        <div class="kv-visual-frame"></div>
+        <div class="kv-visual-rings"></div>
+        <div class="kv-visual-tag">UNIT/KOS</div>
+        <div class="kv-visual-status"><span class="kv-status-dot"></span>OPERATIONAL</div>
+        <div class="kv-visual-icon">
+          <svg class="kv-katanaos-svg" viewBox="0 0 200 200" aria-hidden="true">
+            <!-- Phone outline -->
+            <rect x="60" y="20" width="80" height="160" rx="10" class="kv-os-fill"/>
+            <rect x="60" y="20" width="80" height="160" rx="10"/>
+            <!-- Screen inner -->
+            <rect x="68" y="36" width="64" height="128" rx="2"/>
+            <!-- Speaker notch -->
+            <line x1="90" y1="28" x2="110" y2="28" stroke-width="2"/>
+            <!-- Home indicator -->
+            <line x1="86" y1="172" x2="114" y2="172" stroke-width="2"/>
+            <!-- App grid 3x4 -->
+            <rect x="74" y="44" width="14" height="14" rx="2"/>
+            <rect x="93" y="44" width="14" height="14" rx="2" class="kv-os-fill"/>
+            <rect x="112" y="44" width="14" height="14" rx="2"/>
+            <rect x="74" y="62" width="14" height="14" rx="2" class="kv-os-fill"/>
+            <rect x="93" y="62" width="14" height="14" rx="2"/>
+            <rect x="112" y="62" width="14" height="14" rx="2" class="kv-os-fill"/>
+            <rect x="74" y="80" width="14" height="14" rx="2"/>
+            <rect x="93" y="80" width="14" height="14" rx="2" class="kv-os-fill"/>
+            <rect x="112" y="80" width="14" height="14" rx="2"/>
+            <!-- Crossed katanas overlay (lower half) -->
+            <line x1="74" y1="105" x2="126" y2="155" stroke-width="2"/>
+            <line x1="126" y1="105" x2="74" y2="155" stroke-width="2"/>
+            <!-- Center pulse dot -->
+            <circle cx="100" cy="130" r="4" class="kv-os-dot"/>
+            <circle cx="100" cy="130" r="9"/>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- OKATAN AI — Lean -->
+    <article class="kv-product product-okatan">
+      <span class="kv-scan"></span>
+      <div class="kv-product-content kv-stagger">
+        <div class="kv-product-tag">SYSTEM /02 · STANDALONE AI</div>
+        <h3 class="kv-product-name" data-text="OKATAN AI">
+          <span class="kv-letter">O</span><span class="kv-letter">K</span><span class="kv-letter">A</span><span class="kv-letter">T</span><span class="kv-letter">A</span><span class="kv-letter">N</span><span class="kv-letter" style="display:inline-block;width:0.3em"></span><span class="kv-letter">A</span><span class="kv-letter">I</span>
+        </h3>
+        <div class="kv-product-subtitle">The AI Core · Lean Build</div>
+        <p class="kv-product-desc">
+          The same AI brain that powers KatanaOS — stripped of everything else. <em>Just the conversation</em>. For when you want the AI without the operating layer; a focused thinking partner with voice input, multi-provider routing, and an optional offline brain. <em>Fast to load, easy to embed</em>.
+        </p>
+        <ul class="kv-product-features">
+          <li>Multi-provider AI</li>
+          <li>Voice input</li>
+          <li>Offline brain (WebLLM)</li>
+          <li>Conversation memory</li>
+          <li>Markdown rendering</li>
+          <li>Wake-word optional</li>
+          <li>No clutter, no apps</li>
+          <li>Built for focus</li>
+        </ul>
+        <a class="kv-launch" href="https://katanaverse.ca" target="_blank" rel="noopener" data-cursor="cyan">
+          <span>Open OKATAN AI</span>
+          <span class="kv-arrow">→</span>
+        </a>
+        <div class="kv-mirror-links">
+          HOSTED <a href="https://katanaverse.ca" target="_blank" rel="noopener" data-cursor="cyan">katanaverse.ca</a>
+        </div>
+      </div>
+      <div class="kv-product-visual">
+        <div class="kv-visual-frame"></div>
+        <div class="kv-visual-rings"></div>
+        <div class="kv-visual-tag">UNIT/OK</div>
+        <div class="kv-visual-status"><span class="kv-status-dot"></span>OPERATIONAL</div>
+        <div class="kv-visual-icon">
+          <svg class="kv-okatan-svg" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <radialGradient id="kv-cyan-orb" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#bae6fd" stop-opacity="1"/>
+                <stop offset="50%" stop-color="#7dd3fc" stop-opacity="0.8"/>
+                <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="kv-cyan-core" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                <stop offset="40%" stop-color="#7dd3fc" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.2"/>
+              </radialGradient>
+            </defs>
+            <!-- Outer hexagonal tactical ring -->
+            <polygon points="100,18 168,57 168,143 100,182 32,143 32,57" class="kv-ok-fill"/>
+            <polygon points="100,18 168,57 168,143 100,182 32,143 32,57"/>
+            <!-- Crossed katanas -->
+            <line x1="55" y1="65" x2="145" y2="135" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="145" y1="65" x2="55" y2="135" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Cyan glow halo (outer aura) -->
+            <circle cx="100" cy="100" r="30" fill="url(#kv-cyan-orb)" stroke="none"/>
+            <!-- Cyan orb (the Cortana-style core) -->
+            <circle cx="100" cy="100" r="14" fill="url(#kv-cyan-core)" stroke="none"/>
+            <!-- Thin orbital ring around the orb -->
+            <circle cx="100" cy="100" r="18" stroke="#7dd3fc" stroke-width="0.8" fill="none" opacity="0.5"/>
+            <!-- Bright center highlight -->
+            <circle cx="100" cy="100" r="4" fill="#ffffff" stroke="none" opacity="0.85"/>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+    <!-- SELAH -->
+    <article class="kv-product product-selah">
+      <span class="kv-scan"></span>
+      <div class="kv-product-content kv-stagger">
+        <div class="kv-product-tag">SYSTEM /03 · SCRIPTURE COMPANION</div>
+        <h3 class="kv-product-name" data-text="SELAH">
+          <span class="kv-letter">S</span><span class="kv-letter">E</span><span class="kv-letter">L</span><span class="kv-letter">A</span><span class="kv-letter">H</span>
+        </h3>
+        <div class="kv-product-subtitle">Bible Companion · Pause &amp; Reflect</div>
+        <p class="kv-product-desc">
+          A Bible app built around the Hebrew word <em>Selah</em> — to pause and reflect. Read in nine translations side-by-side, ask scripturally-grounded questions, keep a private prayer journal, and walk through a full year of devotionals written verse-by-verse. <em>Offline-first</em>, ad-free, deeply quiet.
+        </p>
+        <ul class="kv-product-features">
+          <li>9 Bible translations</li>
+          <li>3-way comparison view</li>
+          <li>365 offline devotionals</li>
+          <li>AI thinking partner</li>
+          <li>Prayer journal</li>
+          <li>Memory verses</li>
+          <li>Reading plans</li>
+          <li>Tradition-aware AI</li>
+        </ul>
+        <a class="kv-launch" href="https://pec170.github.io/Selah/" target="_blank" rel="noopener" data-cursor="rose">
+          <span>Open Selah</span>
+          <span class="kv-arrow">→</span>
+        </a>
+        <div class="kv-mirror-links">
+          HOSTED <a href="https://pec170.github.io/Selah/" target="_blank" rel="noopener" data-cursor="rose">pec170.github.io/Selah</a>
+        </div>
+      </div>
+      <div class="kv-product-visual">
+        <div class="kv-visual-frame"></div>
+        <div class="kv-visual-rings"></div>
+        <div class="kv-visual-tag">UNIT/SL</div>
+        <div class="kv-visual-status"><span class="kv-status-dot"></span>OPERATIONAL</div>
+        <div class="kv-visual-icon">
+          <svg class="kv-selah-svg" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <linearGradient id="kv-rose-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fbcfe8"/>
+                <stop offset="50%" stop-color="#f472b6"/>
+                <stop offset="100%" stop-color="#db2777"/>
+              </linearGradient>
+            </defs>
+            <!-- Stylized typographic S, large and centered -->
+            <text x="100" y="142"
+                  text-anchor="middle"
+                  font-family="'Cormorant Garamond', Georgia, serif"
+                  font-size="160"
+                  font-weight="500"
+                  font-style="italic"
+                  fill="url(#kv-rose-grad)"
+                  stroke="url(#kv-rose-grad)"
+                  stroke-width="0.5">S</text>
+            <!-- Cross integrated at upper-right of the S, like a flourish -->
+            <line x1="138" y1="48" x2="138" y2="74" stroke="url(#kv-rose-grad)" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="128" y1="56" x2="148" y2="56" stroke="url(#kv-rose-grad)" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ABOUT / PHILOSOPHY -->
+<section class="kv-about">
+  <div class="kv-about-wrap kv-fade-in">
+    <div class="kv-about-eyebrow">/02 — PHILOSOPHY</div>
+    <p class="kv-about-text">
+      Tools should be sharp, simple, and yours. <span class="kv-w-gold">KatanaOS</span> is the system. <span class="kv-w-cyan">OKATAN</span> is its mind. <span class="kv-w-rose">Selah</span> is its quiet. Built one at a time, with the people they're for in mind — for the operator who wants quiet command over their day, and for the soul that needs space to <span class="kv-w-rose">pause</span>.
+    </p>
+    <div class="kv-about-attribution">— KatanaVerse</div>
+  </div>
+</section>
+
+<!-- OPEN SOURCE -->
+<section class="kv-source">
+  <div class="kv-fade-in">
+    <div class="kv-source-eyebrow">/03 — SOURCE</div>
+    <h2 class="kv-source-title">Built in the Open</h2>
+    <p class="kv-source-text">
+      Every system here is source-available, single-file, and self-hostable. No tracking, no analytics, no telemetry — just the code, on GitHub, for you to read, fork, or build your own.
+    </p>
+    <a class="kv-source-link" href="https://github.com/xerniu3000" target="_blank" rel="noopener">
+      <span class="kv-source-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      </span>
+      <span>View on GitHub</span>
+      <span class="kv-arrow">→</span>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="kv-footer">
+  <div class="kv-footer-wrap">
+    <div>
+      <div class="kv-footer-wordmark">KatanaVerse</div>
+      <div style="margin-top:8px">© 2025–2026 · All systems</div>
+    </div>
+    <div style="text-align:right">
+      <div>BUILT IN CANADA</div>
+      <div style="margin-top:8px">SHARPENED · SINGLE-FILE · SOVEREIGN</div>
+      <div style="margin-top:8px"><a href="https://github.com/xerniu3000" target="_blank" rel="noopener" style="color:var(--steel-dim);text-decoration:none;border-bottom:1px dotted var(--steel-faint);letter-spacing:3px">OPEN SOURCE</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// =========================================
+// KatanaVerse — animations & interactions
+// =========================================
+'use strict';
+
+// Service worker registration — relative path makes it work under any subpath
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch((err) => {
+      console.warn('KatanaVerse SW failed:', err);
+    });
+  });
+}
+
+// Hide loader after blade animation
+setTimeout(() => {
+  document.getElementById('kv-loader').classList.add('hide');
+}, 800);
+
+// Custom cursor
+(function(){
+  const cursor = document.getElementById('kv-cursor');
+  if(!cursor || matchMedia('(hover:none)').matches) return;
+  let tx=0, ty=0, cx=0, cy=0;
+  document.addEventListener('mousemove', e => {
+    tx = e.clientX;
+    ty = e.clientY;
+  }, {passive:true});
+  function loop(){
+    cx += (tx - cx) * 0.2;
+    cy += (ty - cy) * 0.2;
+    cursor.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+    requestAnimationFrame(loop);
+  }
+  loop();
+  // Hover state on interactive elements
+  document.querySelectorAll('a, button, [data-cursor]').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      const c = el.dataset.cursor;
+      cursor.classList.add('hover');
+      if(c === 'rose') cursor.classList.add('hover-rose');
+      if(c === 'gold') cursor.classList.add('hover-gold');
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.classList.remove('hover', 'hover-rose', 'hover-gold');
+    });
+  });
+})();
+
+// Time display
+(function(){
+  const timeEl = document.getElementById('kv-time');
+  if(!timeEl) return;
+  function tick(){
+    const d = new Date();
+    const utc = d.toISOString().substring(11,19);
+    timeEl.textContent = utc + ' UTC';
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+
+// Scroll-triggered reveals
+(function(){
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -80px 0px' });
+  document.querySelectorAll('.kv-fade-in, .kv-stagger, .kv-product').forEach(el => {
+    observer.observe(el);
+  });
+})();
+</script>
+
+</body>
+</html>
